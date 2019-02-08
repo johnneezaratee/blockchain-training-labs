@@ -59,6 +59,8 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.initLedger(APIstub)
 	} else if function == "queryAllInvoice" {
 		return s.queryAllInvoice(APIstub)
+	} else if function == "receiveGoods" {
+		return s.receiveGoods(APIstub, args)
 	} else if function == "getHistoryForCar" {
 		return s.getHistoryForCar(APIstub, args)
 	} else if function == "raiseInvoice" {
@@ -139,6 +141,24 @@ func (s *SmartContract) queryAllInvoice(APIstub shim.ChaincodeStubInterface) sc.
 	fmt.Printf("- displayAllInvoices:\n%s\n", buffer.String())
 
 	return shim.Success(buffer.Bytes())
+}
+
+func (s *SmartContract) receiveGoods(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+
+	invoiceAsBytes, _ := APIstub.GetState(args[0])
+	invoice := Invoice{}
+
+	json.Unmarshal(invoiceAsBytes, &invoice)
+	invoice.GoodsReceived = args[1]
+
+	invoiceAsBytes, _ = json.Marshal(invoice)
+	APIstub.PutState(args[0], invoiceAsBytes)
+
+	return shim.Success(nil)
 }
 
 func (s *SmartContract) getUser(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {

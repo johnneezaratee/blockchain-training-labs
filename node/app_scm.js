@@ -36,7 +36,7 @@ app.get('/test', (req, res) => res.send('Hello World!'))
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
-app.all('/car', function(req, res){    
+app.all('/invoice', function(req, res){    
 
 
 // create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
@@ -85,11 +85,11 @@ var isPaid = req.body.isPaid;
 var paidAmount = req.body.paidAmount;
 var repaid = req.body.repaid;
 var repaymentAmount = req.body.repaymentAmount;
+newInvoice.push(invoiceNumber);
 
 if (req.method == "POST")
 {
   request.fcn='raiseInvoice';
-  newInvoice.push(invoiceNumber);
   newInvoice.push(billedTo);
   newInvoice.push(invoiceDate);
   newInvoice.push(invoiceAmount); 
@@ -99,6 +99,14 @@ if (req.method == "POST")
   newInvoice.push(paidAmount); 
   newInvoice.push(repaid);
   newInvoice.push(repaymentAmount); 
+}
+else if(req.method == "PUT")
+{
+  if(gr)    
+  {
+      request.fcn= 'receiveGoods',
+      newInvoice.push(gr);
+  }
 }
 
 request.args=newInvoice;

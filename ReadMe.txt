@@ -2,7 +2,7 @@ Status update as of 10:00 AM PST, Feb 8 2019
 
 (Done) Raise invoice
 
-(WIP)  Goods received
+(Done)  Goods received
 
 (WIP)  Bank payment to supplier
 
