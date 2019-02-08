@@ -10,6 +10,7 @@ var fabric_client = new Fabric_Client();
 var channel = fabric_client.newChannel('mychannel');
 var peer = fabric_client.newPeer('grpc://localhost:7051');
 channel.addPeer(peer);
+
 var order = fabric_client.newOrderer('grpc://localhost:7050')
 channel.addOrderer(order);
 
@@ -73,40 +74,34 @@ var request = {
   txId: tx_id
 };
 
-var newcar = [];
-var carid = req.body.carid;
-var make = req.body.make;
-var model = req.body.model;
-var color = req.body.color;
-var owner = req.body.owner;
-newcar.push(carid);
+var newInvoice = [];
+var invoiceNumber = req.body.invoiceNumber;
+var billedTo = req.body.billedTo;
+var invoiceDate = req.body.invoiceDate;
+var invoiceAmount = req.body.invoiceAmount;
+var itemDescription = req.body.itemDescription;
+var gr = req.body.gr;
+var isPaid = req.body.isPaid;
+var paidAmount = req.body.paidAmount;
+var repaid = req.body.repaid;
+var repaymentAmount = req.body.repaymentAmount;
+
 if (req.method == "POST")
 {
-  request.fcn='createCar';
-  newcar.push(make);
-  newcar.push(model);
-  newcar.push(color);
-  newcar.push(owner); 
-}
-else if(req.method == "PUT")
-{
-    if(owner)    
-    {
-        request.fcn= 'changeCarOwner',
-        newcar.push(owner);
-    }
-    
-    else if(color)
-    {
-      //TODO START send appropriate attributes for car colour chnage
-        request.fcn= 'changeCarColour',
-        newcar.push(color);
-      //TODO END send appropriate attributes for car colour chnage
-    }
+  request.fcn='raiseInvoice';
+  newInvoice.push(invoiceNumber);
+  newInvoice.push(billedTo);
+  newInvoice.push(invoiceDate);
+  newInvoice.push(invoiceAmount); 
+  newInvoice.push(itemDescription);
+  newInvoice.push(gr);
+  newInvoice.push(isPaid);
+  newInvoice.push(paidAmount); 
+  newInvoice.push(repaid);
+  newInvoice.push(repaymentAmount); 
 }
 
-
-request.args=newcar;
+request.args=newInvoice;
 console.log(request);
 
 // send the transaction proposal to the peers
@@ -207,7 +202,7 @@ console.error('Failed to invoke successfully :: ' + err);
 
 })
 
-app.get('/', function (req, res) {
+app.get('/queryAllInvoice', function (req, res) {
 
 
 
@@ -238,7 +233,7 @@ throw new Error('Failed to get user1.... run registerUser.js');
 const request = {
 //targets : --- letting this default to the peers assigned to the channel
 chaincodeId: 'scm',
-fcn: 'queryAllCars',
+fcn: 'queryAllInvoice',
 args: ['']
 };
 

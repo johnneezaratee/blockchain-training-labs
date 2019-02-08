@@ -57,13 +57,28 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	function, args := APIstub.GetFunctionAndParameters()
 	if function == "initLedger" {
 		return s.initLedger(APIstub)
-	} else if function == "queryAllCars" {
-		return s.queryAllCars(APIstub)
+	} else if function == "queryAllInvoice" {
+		return s.queryAllInvoice(APIstub)
 	} else if function == "getHistoryForCar" {
 		return s.getHistoryForCar(APIstub, args)
+	} else if function == "raiseInvoice" {
+		return s.raiseInvoice(APIstub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
+}
+func (s *SmartContract) raiseInvoice(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 10 {
+		return shim.Error("Incorrect number of arguments. Expecting 5")
+	}
+
+	var invoices = Invoice{InvoiceNumber: args[0], BilledTo: args[1], InvoiceDate: args[2], InvoiceAmount: args[3], ItemDescription: args[4], GoodsReceived: args[5], IsPaid: args[6], PaidAmount: args[7], Repaid: args[8], RepaymentAmount: args[9]}
+
+	invoiceAsBytes, _ := json.Marshal(invoices)
+	APIstub.PutState(args[0], invoiceAsBytes)
+
+	return shim.Success(nil)
 }
 
 func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
@@ -83,7 +98,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	return shim.Success(nil)
 }
 
-func (s *SmartContract) queryAllCars(APIstub shim.ChaincodeStubInterface) sc.Response {
+func (s *SmartContract) queryAllInvoice(APIstub shim.ChaincodeStubInterface) sc.Response {
 
 	startKey := "INV0"
 	endKey := "INV999"
@@ -116,7 +131,7 @@ func (s *SmartContract) queryAllCars(APIstub shim.ChaincodeStubInterface) sc.Res
 		buffer.WriteString(", \"Record\":")
 		// Record is a JSON object, so we write as-is
 		buffer.WriteString(string(queryResponse.Value))
-		buffer.WriteString("}")
+		buffer.WriteString("}\n")
 		bArrayMemberAlreadyWritten = true
 	}
 	buffer.WriteString("]")
